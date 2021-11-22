@@ -1,0 +1,26 @@
+name: 'Live Preview FRP'
+description: 'A github action for live preview docker applications using frp (fast reverse proxy).'
+
+branding:
+  icon: 'activity'
+  color: 'green'
+
+inputs:
+  config:
+    description: 'The frp config file.'
+    default: frpc.ini
+  domain:
+    description: 'The domain name for the exposed app.'
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+    - run: wget https://github.com/fatedier/frp/releases/download/v0.38.0/frp_0.38.0_linux_amd64.tar.gz
+      shell: bash
+    - run: tar -xvf frp_0.38.0_linux_amd64.tar.gz
+      shell: bash
+    - run: echo "custom_domains = ${{ inputs.domain }}" | tee -a ${{ inputs.config }} >/dev/null
+      shell: bash
+    - run: ./frp_0.38.0_linux_amd64/frpc -c ./${{ inputs.config }} &
+      shell: bash
